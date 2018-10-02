@@ -108,9 +108,9 @@
             var vetice = []
             var color = []
             var rObjek = []
-            var xPos = []
-            var yPos = []
+            var translation = []
             var objekRotate = []
+            var boundaries = []
             function initBuffers(jumlah, vertices) {
                 for (var a=0; a<jumlah; a++) {
                     rObjek.push(0)
@@ -137,12 +137,11 @@
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
                 mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
                 mat4.identity(mvMatrix)
-                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0])
+                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -50.0])
                 for (var a=0;a<objek.length;a++) {
-                    yPos[a] += 0.01
-                    mat4.translate(mvMatrix, mvMatrix, [0.0, yPos[a], 0.0])
-                    mvPushMatrix()
+                    mat4.translate(mvMatrix, mvMatrix, translation[a])
                     mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rObjek[a]), objekRotate[a])
+                    mvPushMatrix()
                     gl.bindBuffer(gl.ARRAY_BUFFER, objek[a])
                     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, objek[a].itemSize, gl.FLOAT, false, 0, 0)
                     gl.bindBuffer(gl.ARRAY_BUFFER, objekcolor[a])
@@ -151,6 +150,13 @@
                     gl.drawArrays(gl.TRIANGLES, 0, objek[a].numItems)
                     mvPopMatrix()
                 }
+            }
+            function getRealPosition(objeks) {
+                var res = []
+                for (var a=0;a<4;a++) {
+                    res.push(objeks[a]*mvMatrix[a] + objeks[a]*mvMatrix[a+4] + objeks[a]*mvMatrix[a+8] + objeks[a]*mvMatrix[a+12])
+                }
+                return res
             }
             var lastTime = 0
             function animate() {
@@ -174,11 +180,131 @@
                 initShaders()
                 var vertec = []
                 vertec.push([
-                    0.0, 1.0, 0.0,
-                    -1.0, -1.0, 0.0,
-                    1.0, -1.0, 0.0,
+                    // H -
+                    -3.0, 1.0, 0.0,
+                    3.0, 1.0, 0.0,
+                    3.0, -1.0, 0.0,
+                    -3.0, 1.0, 0.0,
+                    3.0, -1.0, 0.0,
+                    -3.0, -1.0, 0.0,
+
+                    -3.0, 1.0, 2.0,
+                    3.0, 1.0, 2.0,
+                    3.0, -1.0, 2.0,
+                    -3.0, 1.0, 2.0,
+                    3.0, -1.0, 2.0,
+                    -3.0, -1.0, 2.0,
+
+                    -3.0, 1.0, 0.0,
+                    -3.0, 1.0, 2.0,
+                    3.0, 1.0, 0.0,
+                    3.0, 1.0, 0.0,
+                    3.0, 1.0, 2.0,
+                    -3.0, 1.0, 2.0,
+
+                    -3.0, -1.0, 0.0,
+                    -3.0, -1.0, 2.0,
+                    3.0, -1.0, 0.0,
+                    3.0, -1.0, 0.0,
+                    3.0, -1.0, 2.0,
+                    -3.0, -1.0, 2.0,
+                    // H | (kiri)
+                    -5.0, 6.0, 0.0,
+                    -3.0, 6.0, 0.0,
+                    -3.0, -6.0, 0.0,
+                    -5.0, 6.0, 0.0,
+                    -3.0, -6.0, 0.0,
+                    -5.0, -6.0, 0.0,
+
+                    -5.0, 6.0, 2.0,
+                    -3.0, 6.0, 2.0,
+                    -3.0, -6.0, 2.0,
+                    -5.0, 6.0, 2.0,
+                    -3.0, -6.0, 2.0,
+                    -5.0, -6.0, 2.0,
+
+                    -5.0, 6.0, 0.0,
+                    -5.0, 6.0, 2.0,
+                    -3.0, 6.0, 0.0,
+                    -3.0, 6.0, 0.0,
+                    -3.0, 6.0, 2.0,
+                    -5.0, 6.0, 2.0,
+
+                    -5.0, -6.0, 0.0,
+                    -5.0, -6.0, 2.0,
+                    -3.0, -6.0, 0.0,
+                    -3.0, -6.0, 0.0,
+                    -3.0, -6.0, 2.0,
+                    -5.0, -6.0, 2.0,
+
+                    -5.0, 6.0, 0.0,
+                    -5.0, 6.0, 2.0,
+                    -5.0, -6.0, 0.0,
+                    -5.0, -6.0, 0.0,
+                    -5.0, -6.0, 2.0,
+                    -5.0, 6.0, 2.0,
+
+                    -3.0, 6.0, 0.0,
+                    -3.0, 6.0, 2.0,
+                    -3.0, -6.0, 0.0,
+                    -3.0, -6.0, 0.0,
+                    -3.0, -6.0, 2.0,
+                    -3.0, 6.0, 2.0,
+                    // H | (kanan)
+                    3.0, 6.0, 0.0,
+                    5.0, 6.0, 0.0,
+                    5.0, -6.0, 0.0,
+                    3.0, 6.0, 0.0,
+                    5.0, -6.0, 0.0,
+                    3.0, -6.0, 0.0,
+
+                    5.0, 6.0, 2.0,
+                    3.0, 6.0, 2.0,
+                    3.0, -6.0, 2.0,
+                    5.0, 6.0, 2.0,
+                    3.0, -6.0, 2.0,
+                    5.0, -6.0, 2.0,
+
+                    5.0, 6.0, 0.0,
+                    5.0, 6.0, 2.0,
+                    3.0, 6.0, 0.0,
+                    3.0, 6.0, 0.0,
+                    3.0, 6.0, 2.0,
+                    5.0, 6.0, 2.0,
+
+                    5.0, -6.0, 0.0,
+                    5.0, -6.0, 2.0,
+                    3.0, -6.0, 0.0,
+                    3.0, -6.0, 0.0,
+                    3.0, -6.0, 2.0,
+                    5.0, -6.0, 2.0,
+
+                    5.0, 6.0, 0.0,
+                    5.0, 6.0, 2.0,
+                    5.0, -6.0, 0.0,
+                    5.0, -6.0, 0.0,
+                    5.0, -6.0, 2.0,
+                    5.0, 6.0, 2.0,
+
+                    3.0, 6.0, 0.0,
+                    3.0, 6.0, 2.0,
+                    3.0, -6.0, 0.0,
+                    3.0, -6.0, 0.0,
+                    3.0, -6.0, 2.0,
+                    3.0, 6.0, 2.0,
                 ])
-                yPos = yPos.concat([0])
+                boundaries.push(
+                    [-5.0, 6.0, 0.0, 0.0],
+                    [-5.0, 6.0, 2.0, 0.0],
+                    [-5.0, -6.0, 0.0, 0.0],
+                    [-5.0, -6.0, 2.0, 0.0],
+                    [5.0, 6.0, 0.0, 0.0],
+                    [5.0, 6.0, 2.0, 0.0],
+                    [5.0, -6.0, 0.0, 0.0],
+                    [5.0, -6.0, 2.0, 0.0]
+                )
+                console.log(Math.random() * (1-(-1)) + (-1))
+                translation.push([1.0, 1.0, 1.0])
                 objekRotate.push([1.0, 0.0, 0.0])
                 initBuffers(vertec.length, vertec)
                 gl.clearColor(0.0, 0.0, 0.0, 1.0)
