@@ -98,7 +98,7 @@ function vertexPosition(vertexs, matrix) {
     var result = []
     vertexs.push(1.0)
     for (var a=0;a<4;a++) {
-        result.push((vertexs[a]*matrix[a]) + (vertexs[a]*matrix[a+4]) + (vertexs[a]*matrix[a+8]) + (vertexs[a]*matrix[a+12]))
+        result.push((vertexs[0]*matrix[a]) + (vertexs[1]*matrix[a+4]) + (vertexs[2]*matrix[a+8]) + (vertexs[3]*matrix[a+12]))
     }
     result.pop()
     return result
@@ -113,6 +113,38 @@ function checkCollision(kubus_matrix, huruf_matrix) {
     for (var a=0;a<kubusboundaries.length;a++) {
         kubusPos.push(vertexPosition(kubusboundaries[a], kubus_matrix))
     }
+    for (var a=0;a<realPos.length;a++) {
+        if (realPos[a][0] >= kubusPos[0][0]) {
+            if (hurufHarah[0] > 0) {
+                hurufHarah[0] = hurufHarah[0] * -1.0
+            }
+        }
+        if(realPos[a][0] <= kubusPos[1][0]) {
+            if (hurufHarah[0] < 0){
+                hurufHarah[0] = hurufHarah[0] * -1.0
+            }
+        }
+        if (realPos[a][1] >= kubusPos[0][1]) {
+            if (hurufHarah[1] > 0) {
+                hurufHarah[1] = hurufHarah[1] * -1.0
+            }
+        }
+        if(realPos[a][1] <= kubusPos[1][1]) {
+            if (hurufHarah[1] < 0) {
+                hurufHarah[1] = hurufHarah[1] * -1.0
+            }
+        }
+        if (realPos[a][2] >= kubusPos[0][2]) {
+            if (hurufHarah > 0) {
+                hurufHarah[2] = hurufHarah[2] * -1.0
+            }
+        }
+        if(realPos[a][2] <= kubusPos[1][2]) {
+            if (hurufHarah < 0) {
+                hurufHarah[2] = hurufHarah[2] * -1.0
+            }
+        }
+    }
 }
 
 var hurufHobjek
@@ -120,6 +152,7 @@ var hurufHcolor
 var hurufHboundaries
 var hurufHsudut = 0
 var hurufHtranslate = [0.0, 0.0, 0.0]
+var hurufHarah = [(Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1), (Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1), (Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1)]
 
 var kubusobjek
 var kubuscolor
@@ -278,7 +311,10 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
     kubuscolor.itemSize = 4
     kubuscolor.numItems = kubusobjek.numItems
-    kubusboundaries = Cvertex
+    kubusboundaries = [
+        [15.0, 15.0, 15.0],
+        [-15.0, -15.0, -15.0]
+    ]
 }
 
 function drawScene() {
@@ -288,14 +324,15 @@ function drawScene() {
     mat4.identity(mvMatrix)
     mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -100.0])
     mvPushMatrix()
-    mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [0.0, 0.0, 0.0])
     gl.bindBuffer(gl.ARRAY_BUFFER, kubusobjek)
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, kubusobjek.itemSize, gl.FLOAT, false, 0, 0)
     gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, kubuscolor.itemSize, gl.FLOAT, false, 0, 0)
+    var kubus_matrix = mat4.create()
+    mat4.copy(kubus_matrix, mvMatrix)
     setMatrixUniforms()
     gl.drawArrays(gl.LINES, 0, kubusobjek.numItems)
-    var kubus_matrix = mvMatrix
+    mvPopMatrix()
     //Huruf H
     mvPushMatrix()
     mat4.translate(mvMatrix, mvMatrix, hurufHtranslate)
@@ -304,10 +341,12 @@ function drawScene() {
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, hurufHobjek.itemSize, gl.FLOAT, false, 0, 0)
     gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, hurufHcolor.itemSize, gl.FLOAT, false, 0, 0)
+    var huruf_matrix = mat4.create()
+    mat4.copy(huruf_matrix, mvMatrix)
     setMatrixUniforms()
     gl.drawArrays(gl.TRIANGLES, 0, hurufHobjek.numItems)
     mvPopMatrix()
-    checkCollision(kubus_matrix, mvMatrix)
+    checkCollision(kubus_matrix, huruf_matrix)
 }
 
 var lastTime = 0
@@ -316,7 +355,9 @@ function animate() {
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime
         hurufHsudut += (90 * elapsed) / 1000.0
-        hurufHtranslate[1] += 0.1
+        hurufHtranslate[0] += hurufHarah[0]
+        hurufHtranslate[1] += hurufHarah[1]
+        hurufHtranslate[2] += hurufHarah[2]
     }
     lastTime = timeNow
 }
