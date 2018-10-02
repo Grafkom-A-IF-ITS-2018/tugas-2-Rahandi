@@ -94,10 +94,32 @@ function generate3D(vertices, faces) {
     return result
 }
 
+function vertexPosition(vertexs, matrix) {
+    var result = []
+    vertexs.push(1.0)
+    for (var a=0;a<4;a++) {
+        result.push((vertexs[a]*matrix[a]) + (vertexs[a]*matrix[a+4]) + (vertexs[a]*matrix[a+8]) + (vertexs[a]*matrix[a+12]))
+    }
+    result.pop()
+    return result
+}
+
+function checkCollision(kubus_matrix, huruf_matrix) {
+    var realPos = []
+    var kubusPos = []
+    for (var a=0;a<hurufHboundaries.length;a++) {
+        realPos.push(vertexPosition(hurufHboundaries[a], huruf_matrix))
+    }
+    for (var a=0;a<kubusboundaries.length;a++) {
+        kubusPos.push(vertexPosition(kubusboundaries[a], kubus_matrix))
+    }
+}
+
 var hurufHobjek
 var hurufHcolor
 var hurufHboundaries
 var hurufHsudut = 0
+var hurufHtranslate = [0.0, 0.0, 0.0]
 
 var kubusobjek
 var kubuscolor
@@ -201,14 +223,14 @@ function initBuffers() {
     hurufHcolor.itemSize = 4
     hurufHcolor.numItems = hurufHobjek.numItems
     hurufHboundaries = [
-        [-5.0, 6.0, 1.0, 1.0],
-        [-5.0, 6.0, -1.0, 1.0],
-        [-5.0, -6.0, 1.0, 1.0],
-        [-5.0, -6.0, -1.0, 1.0],
-        [5.0, 6.0, 1.0, 1.0],
-        [5.0, 6.0, -1.0, 1.0],
-        [5.0, -6.0, 1.0, 1.0],
-        [5.0, -6.0, -1.0, 1.0]
+        [-5.0, 6.0, 1.0],
+        [-5.0, 6.0, -1.0],
+        [-5.0, -6.0, 1.0],
+        [-5.0, -6.0, -1.0],
+        [5.0, 6.0, 1.0],
+        [5.0, 6.0, -1.0],
+        [5.0, -6.0, 1.0],
+        [5.0, -6.0, -1.0]
     ]
 
     //Cubic
@@ -256,6 +278,7 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
     kubuscolor.itemSize = 4
     kubuscolor.numItems = kubusobjek.numItems
+    kubusboundaries = Cvertex
 }
 
 function drawScene() {
@@ -264,16 +287,6 @@ function drawScene() {
     mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0)
     mat4.identity(mvMatrix)
     mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -100.0])
-    //Huruf H
-    mvPushMatrix()
-    mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [1.0, 1.0, 1.0])
-    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHobjek)
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, hurufHobjek.itemSize, gl.FLOAT, false, 0, 0)
-    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
-    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, hurufHcolor.itemSize, gl.FLOAT, false, 0, 0)
-    setMatrixUniforms()
-    gl.drawArrays(gl.TRIANGLES, 0, hurufHobjek.numItems)
-    mvPopMatrix()
     mvPushMatrix()
     mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [0.0, 0.0, 0.0])
     gl.bindBuffer(gl.ARRAY_BUFFER, kubusobjek)
@@ -282,6 +295,19 @@ function drawScene() {
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, kubuscolor.itemSize, gl.FLOAT, false, 0, 0)
     setMatrixUniforms()
     gl.drawArrays(gl.LINES, 0, kubusobjek.numItems)
+    var kubus_matrix = mvMatrix
+    //Huruf H
+    mvPushMatrix()
+    mat4.translate(mvMatrix, mvMatrix, hurufHtranslate)
+    mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [1.0, 1.0, 1.0])
+    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHobjek)
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, hurufHobjek.itemSize, gl.FLOAT, false, 0, 0)
+    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, hurufHcolor.itemSize, gl.FLOAT, false, 0, 0)
+    setMatrixUniforms()
+    gl.drawArrays(gl.TRIANGLES, 0, hurufHobjek.numItems)
+    mvPopMatrix()
+    checkCollision(kubus_matrix, mvMatrix)
 }
 
 var lastTime = 0
@@ -290,6 +316,7 @@ function animate() {
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime
         hurufHsudut += (90 * elapsed) / 1000.0
+        hurufHtranslate[1] += 0.1
     }
     lastTime = timeNow
 }
