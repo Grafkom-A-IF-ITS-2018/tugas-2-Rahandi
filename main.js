@@ -135,12 +135,12 @@ function checkCollision(kubus_matrix, huruf_matrix) {
             }
         }
         if (realPos[a][2] >= kubusPos[0][2]) {
-            if (hurufHarah > 0) {
+            if (hurufHarah[2] > 0) {
                 hurufHarah[2] = hurufHarah[2] * -1.0
             }
         }
         if(realPos[a][2] <= kubusPos[1][2]) {
-            if (hurufHarah < 0) {
+            if (hurufHarah[2] < 0) {
                 hurufHarah[2] = hurufHarah[2] * -1.0
             }
         }
@@ -152,7 +152,8 @@ var hurufHcolor
 var hurufHboundaries
 var hurufHsudut = 0
 var hurufHtranslate = [0.0, 0.0, 0.0]
-var hurufHarah = [(Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1), (Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1), (Math.random()*0.1)*(Math.random() < 0.5 ? -1 : 1)]
+var hurufHarah = [0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1)]
+// var hurufHarah = [1.0, 0.0, 0.0]
 
 var kubusobjek
 var kubuscolor
@@ -312,12 +313,24 @@ function initBuffers() {
     kubuscolor.itemSize = 4
     kubuscolor.numItems = kubusobjek.numItems
     kubusboundaries = [
-        [15.0, 15.0, 15.0],
-        [-15.0, -15.0, -15.0]
+        [25.0, 25.0, 25.0],
+        [-25.0, -25.0, -25.0]
     ]
 }
 
 function drawScene() {
+    var Hcolor = []
+    for (var a=0;a<hurufHobjek.numItems;a++) {
+        Hcolor = Hcolor.concat([Math.random(), Math.random(), Math.random(), 1.0])
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
+    var Ccolor = []
+    for (var a=0;a<kubusobjek.numItems;a++) {
+        Ccolor = Ccolor.concat([Math.random(), Math.random(), Math.random(), 1.0])
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0)
