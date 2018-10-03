@@ -94,6 +94,20 @@ function generate3D(vertices, faces) {
     return result
 }
 
+function generateColor(vertices, faces) {
+    var result = []
+    var color_map = []
+    for (var a=0;a<vertices.length;a++) {
+        color_map.push([Math.random(), Math.random(), Math.random(), 1.0])
+    }
+    for (var a=0;a<faces.length;a++) {
+        for (var b=0;b<faces[a].length;b++) {
+            result = result.concat(color_map[faces[a][b]])
+        }
+    }
+    return result
+}
+
 function vertexPosition(vertexs, matrix) {
     var result = []
     vertexs.push(1.0)
@@ -160,11 +174,13 @@ var hurufHsudut = 0
 var hurufHrotation = 1.0*(Math.random() < 0.5 ? -1 : 1)
 var hurufHtranslate = [0.0, 0.0, 0.0]
 var hurufHarah = [0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1)]
-// var hurufHarah = [1.0, 0.0, 0.0]
 
 var kubusobjek
 var kubuscolor
 var kubusboundaries
+
+var Hcolor = []
+var Ccolor = []
 
 function initBuffers() {
     // Huruf H
@@ -241,23 +257,24 @@ function initBuffers() {
         [16, 17, 21],
         [0, 12, 18],
         [0, 6, 18],
-        [1, 13, 19],
-        [1, 7, 19],
-        [2, 14, 22],
-        [2, 10, 22],
+        [1, 13, 16],
+        [1, 4, 16],
+        [5, 17, 19],
+        [5, 7, 19],
+        [2, 14, 20],
+        [2, 8, 20],
+        [9, 21, 22],
+        [9, 10, 22],
         [3, 15, 23],
         [3, 11, 23]
     ]
     var Hvertices = generate3D(Hvertex, Hfaces)
+    Hcolor = generateColor(Hvertex, Hfaces)
     hurufHobjek = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, hurufHobjek)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hvertices), gl.STATIC_DRAW)
     hurufHobjek.itemSize = 3
     hurufHobjek.numItems = Hvertices.length / 3
-    var Hcolor = []
-    for (var a=0;a<hurufHobjek.numItems;a++) {
-        Hcolor = Hcolor.concat([Math.random(), Math.random(), Math.random(), 1.0])
-    }
     hurufHcolor = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
@@ -305,15 +322,12 @@ function initBuffers() {
         [1,3]
     ]
     var Cvertices = generate3D(Cvertex, Cfaces)
+    Ccolor = generateColor(Cvertex, Cfaces)
     kubusobjek = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, kubusobjek)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Cvertices), gl.STATIC_DRAW)
     kubusobjek.itemSize = 3
     kubusobjek.numItems = Cvertices.length / 3
-    var Ccolor = []
-    for (var a=0;a<kubusobjek.numItems;a++) {
-        Ccolor = Ccolor.concat([1.0, 1.0, 1.0, 1.0])
-    }
     kubuscolor = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
@@ -326,18 +340,6 @@ function initBuffers() {
 }
 
 function drawScene() {
-    var Hcolor = []
-    for (var a=0;a<hurufHobjek.numItems;a++) {
-        Hcolor = Hcolor.concat([Math.random(), Math.random(), Math.random(), 1.0])
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
-    var Ccolor = []
-    for (var a=0;a<kubusobjek.numItems;a++) {
-        Ccolor = Ccolor.concat([Math.random(), Math.random(), Math.random(), 1.0])
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0)
