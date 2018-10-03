@@ -117,31 +117,37 @@ function checkCollision(kubus_matrix, huruf_matrix) {
         if (realPos[a][0] >= kubusPos[0][0]) {
             if (hurufHarah[0] > 0) {
                 hurufHarah[0] = hurufHarah[0] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
         if(realPos[a][0] <= kubusPos[1][0]) {
             if (hurufHarah[0] < 0){
                 hurufHarah[0] = hurufHarah[0] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
         if (realPos[a][1] >= kubusPos[0][1]) {
             if (hurufHarah[1] > 0) {
                 hurufHarah[1] = hurufHarah[1] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
         if(realPos[a][1] <= kubusPos[1][1]) {
             if (hurufHarah[1] < 0) {
                 hurufHarah[1] = hurufHarah[1] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
         if (realPos[a][2] >= kubusPos[0][2]) {
             if (hurufHarah[2] > 0) {
                 hurufHarah[2] = hurufHarah[2] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
         if(realPos[a][2] <= kubusPos[1][2]) {
             if (hurufHarah[2] < 0) {
                 hurufHarah[2] = hurufHarah[2] * -1.0
+                hurufHrotation = hurufHrotation * -1.0
             }
         }
     }
@@ -151,6 +157,7 @@ var hurufHobjek
 var hurufHcolor
 var hurufHboundaries
 var hurufHsudut = 0
+var hurufHrotation = 1.0*(Math.random() < 0.5 ? -1 : 1)
 var hurufHtranslate = [0.0, 0.0, 0.0]
 var hurufHarah = [0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1), 0.1*(Math.random() < 0.5 ? -1 : 1)]
 // var hurufHarah = [1.0, 0.0, 0.0]
@@ -349,7 +356,7 @@ function drawScene() {
     //Huruf H
     mvPushMatrix()
     mat4.translate(mvMatrix, mvMatrix, hurufHtranslate)
-    mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [1.0, 1.0, 1.0])
+    mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [0.0, 1.0, 0.0])
     gl.bindBuffer(gl.ARRAY_BUFFER, hurufHobjek)
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, hurufHobjek.itemSize, gl.FLOAT, false, 0, 0)
     gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
@@ -367,7 +374,7 @@ function animate() {
     var timeNow = new Date().getTime()
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime
-        hurufHsudut += (90 * elapsed) / 1000.0
+        hurufHsudut += ((90 * elapsed) / 1000.0)*hurufHrotation
         hurufHtranslate[0] += hurufHarah[0]
         hurufHtranslate[1] += hurufHarah[1]
         hurufHtranslate[2] += hurufHarah[2]
