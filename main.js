@@ -181,6 +181,8 @@ var kubusboundaries
 
 var Hcolor = []
 var Ccolor = []
+var Hcolortrans = 1.0
+var Ccolortrans = 1.0
 
 function initBuffers() {
     // Huruf H
@@ -341,22 +343,31 @@ function initBuffers() {
 
 function drawScene() {
     var count = 0
-    for (var a=0;a<Hcolor.length;a++) {
-        if (count == 3) {
-            count = 0
-        }
-        else {
-            Hcolor[a] = (Hcolor[a] + (Math.random()*0.01))%1.0
-        }
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
+    var tambah
+    // for (var a=0;a<Hcolor.length;a++) {
+    //     if (count == 3) {
+    //         count = 0
+    //     }
+    //     else {
+    //         tambah = Math.random()*0.01
+    //         if (Hcolor[a] + (tambah * Hcolortrans) > 1.0 || Hcolor[a] + (tambah * Hcolortrans) < 0) {
+    //             Hcolortrans *= -1.0
+    //         }
+    //         Hcolor[a] = (Hcolor[a] + (tambah*Hcolortrans))%1.0
+    //     }
+    // }
+    // gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
     for (var a=0;a<Ccolor.length;a++) {
         if (count == 3) {
             count = 0
         }
         else {
-            Ccolor[a] = (Ccolor[a] + (Math.random()*0.01))%1.0
+            tambah = Math.random()*0.1
+            if (Ccolor[a] + (tambah * Ccolortrans) > 1.0 || Ccolor[a] + (tambah * Ccolortrans) < 0) {
+                Ccolortrans *= -1.0
+            }
+            Ccolor[a] = (Ccolor[a] + (tambah*Ccolortrans))%1.0
         }
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
