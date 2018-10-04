@@ -340,6 +340,28 @@ function initBuffers() {
 }
 
 function drawScene() {
+    var count = 0
+    for (var a=0;a<Hcolor.length;a++) {
+        if (count == 3) {
+            count = 0
+        }
+        else {
+            Hcolor[a] = (Hcolor[a] + (Math.random()*0.01))%1.0
+        }
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, hurufHcolor)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Hcolor), gl.STATIC_DRAW)
+    for (var a=0;a<Ccolor.length;a++) {
+        if (count == 3) {
+            count = 0
+        }
+        else {
+            Ccolor[a] = (Ccolor[a] + (Math.random()*0.01))%1.0
+        }
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, kubuscolor)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Ccolor), gl.STATIC_DRAW)
+
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 200.0)
@@ -356,6 +378,8 @@ function drawScene() {
     gl.drawArrays(gl.LINES, 0, kubusobjek.numItems)
     mvPopMatrix()
     //Huruf H
+    mat4.identity(mvMatrix)
+    mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -100.0])
     mvPushMatrix()
     mat4.translate(mvMatrix, mvMatrix, hurufHtranslate)
     mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(hurufHsudut), [0.0, 1.0, 0.0])
